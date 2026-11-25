@@ -1,0 +1,124 @@
+{% extends "farm/base.html" %}{% load static aq %}
+{% block title %}{{ field.name }} · AquaSense{% endblock %}
+{% block content %}
+<header class="head">
+  <div>
+    <h1>{{ field.name }}</h1>
+    <p class="sub">{{ field.crop }}, {{ field.area_ha|floatformat:"-2" }} ha, {{ field.location }}</p>
+  </div>
+  <div class="headside">
+    {% if status %}<span class="status {{ status }}"><i></i>{% if status == 'dry' %}{% t "status_dry" %}{% elif status == 'wet' %}{% t "status_wet" %}{% else %}{% t "status_ok" %}{% endif %}</span>{% endif %}
+    {% if latest %}<p class="stamp">{% t "last_reading" %} {{ latest.recorded_at|date:"d M, H:i" }}</p>{% endif %}
+  </div>
+</header>
+
+{% if not latest %}
+  <section class="panel empty"><h2>Waiting for the first reading</h2>
+    <p>Point your sensor at this field using the device code{% if sensor %} <code>{{ sensor.device_code }}</code>{% endif %}. To try it without hardware, run <code>python iot/simulator.py --device {% if sensor %}{{ sensor.device_code }}{% else %}CODE{% endif %}</code>.</p></section>
+{% else %}
+<section class="hero">
+  <figure class="column panel">
+    <svg id="soil" viewBox="0 0 220 340" role="img" aria-label="{% t 'soil_moisture' %}"
+         data-now="{{ latest.soil_moisture }}" data-low="{{ low }}" data-high="{{ high }}"
+         data-pred="{% if forecast %}{{ forecast.predicted_6h }}{% endif %}"></svg>
+    <figcaption><strong>{{ latest.soil_moisture|floatformat:1 }}%</strong> {% t "soil_moisture" %}</figcaption>
+  </figure>
+
+  <div class="story">
+    <h2 class="lede">
+      {% if forecast %}
+        {% if forecast.action == 'irrigate' %}{% t "lede_irrigate" p=forecast.predicted_6h m=forecast.duration_min %}
+        {% elif forecast.action == 'skip_rain' %}{% t "lede_rain" p=forecast.predicted_6h %}
+        {% else %}{% t "lede_hold" p=forecast.predicted_6h %}{% endif %}
+      {% else %}{% t "lede_offline" %}{% endif %}
+    </h2>
+    {% if forecast %}
+      <p class="note">
+        {% if forecast.action == 'irrigate' %}About {{ forecast.volume_l }} litres to bring the root zone back to {{ high }}%. {% endif %}
+        Forecast {{ forecast.predicted_6h }}% (±{{ forecast.margin }}).
+        {% if forecast.rain_mm %}Rain expected in the next 12 hours: {{ forecast.rain_mm }} mm.{% endif %}
+      </p>
+    {% endif %}
+    <p class="note chips2">
+      <span class="pillnote">{% t "growth_stage" %}: <b>{{ stage.name }}</b>{% if stage.day is not None and stage.day >= 0 %} (day {{ stage.day }}){% endif %}</span>
+      <span class="pillnote">Water below <b>{{ low }}%</b>, refill to <b>{{ high }}%</b></span>
+      <span class="pillnote">{% t "forecast_accuracy" %}: {% if accuracy %}<b>±{{ accuracy.mae }}%</b> ({{ accuracy.n }} checks, 7 days){% else %}collecting data{% endif %}</span>
+    </p>
+    <dl class="facts">
+      <div><dt>{% t "air" %}</dt><dd>{{ latest.air_temp|default_if_none:"-"|floatformat:"-1" }}°C</dd></div>
+      <div><dt>{% t "soil" %}</dt><dd>{{ latest.soil_temp|default_if_none:"-"|floatformat:"-1" }}°C</dd></div>
+      <div><dt>{% t "humidity" %}</dt><dd>{{ latest.humidity|default_if_none:"-"|floatformat:"-1" }}%</dd></div>
+      <div><dt>{% t "battery" %}</dt><dd>{{ latest.battery|default_if_none:"-"|floatformat:"-1" }}%</dd></div>
+    </dl>
+    <div class="panel chart"><canvas id="trend" height="150" data-url="{% url 'series' field.id %}" data-low="{{ low }}" data-high="{{ high }}"></canvas></div>
+  </div>
+</section>
+
+<section class="row">
+  <div class="panel">
+    <h3>{% t "next_watering" %}</h3>
+    {% if next_run %}
+      <p class="big">{{ next_run.scheduled_for|date:"D d M, H:i" }}{% if next_run.status == 'running' %} <span class="tag">Running</span>{% endif %}</p>
+      <p>{{ next_run.duration_min }} {% t "minutes" %}, {{ next_run.volume_l }} L</p>
+      <p class="note">{{ next_run.reason }}{% if next_run.source == 'ai' %} (planned by AquaSense){% endif %}</p>
+    {% else %}<p class="note">{% t "nothing_planned" %} <a href="{% url 'schedule' %}">{% t "nav_schedule" %}</a></p>{% endif %}
+  </div>
+  <div class="panel">
+    <h3>{% t "needs_attention" %}</h3>
+    {% for a in alerts %}<p class="alert {{ a.level }}">{{ a.message }}</p>{% empty %}<p class="note">{% t "all_clear" %}</p>{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="panel valve">
+  <div>
+    <h3>{% t "valve" %}</h3>
+    <p class="big"><span class="dot {{ field.valve_state }}"></span>{% if field.valve_state == 'open' %}{% t "valve_open" %}{% else %}{% t "valve_closed" %}{% endif %}</p>
+    {% if field.valve_state == 'open' and field.valve_until %}<p class="note">Closes by {{ field.valve_until|date:"H:i" }}</p>{% endif %}
+    <p class="note">Safety limit: {{ field.max_run_min }} {% t "minutes" %} per run. The valve also stays shut if the soil is already at its target.</p>
+  </div>
+  <div class="valvectl">
+    <form method="post" action="{% url 'valve_control' field.id %}" class="seg" aria-label="Valve mode">{% csrf_token %}
+      <button name="action" value="auto" class="{% if field.valve_mode == 'auto' %}on{% endif %}">{% t "valve_auto" %}</button>
+      <button name="action" value="off" class="{% if field.valve_mode == 'off' %}on{% endif %}">{% t "valve_off" %}</button>
+    </form>
+    <form method="post" action="{% url 'valve_control' field.id %}" class="inline">{% csrf_token %}
+      <label>{% t "minutes" %}<input type="number" name="minutes" value="30" min="5" max="{{ field.max_run_min }}"></label>
+      <button name="action" value="water_now" class="btn">{% t "water_now" %}</button>
+      <button name="action" value="stop" class="btn ghost">{% t "stop" %}</button>
+    </form>
+  </div>
+</section>
+
+<section class="panel fielddetail">
+  <div>
+    <h3>{% t "field_details" %}</h3>
+    <dl class="facts two">
+      <div><dt>Area</dt><dd>{{ field.area_ha|floatformat:"-2" }} ha</dd></div>
+      <div><dt>Crop</dt><dd>{{ field.crop }}</dd></div>
+      <div><dt>Planted</dt><dd>{{ field.planted_on|date:"d M Y"|default:"not set" }}</dd></div>
+      <div><dt>Root depth</dt><dd>{{ field.root_depth_mm }} mm</dd></div>
+      <div><dt>Drip flow</dt><dd>{{ field.flow_lph }} L/h</dd></div>
+      <div><dt>Alerts sent to</dt><dd>{{ field.contact_phone|default:"no phone set" }}</dd></div>
+      {% if sensor %}<div><dt>Sensor code</dt><dd>{{ sensor.device_code }}</dd></div>
+      <div><dt>Device key</dt><dd class="mono">{{ sensor.device_key|default:"shared key" }}</dd></div>{% endif %}
+      {% if geo %}<div><dt>Coordinates</dt><dd>{{ field.latitude }}, {{ field.longitude }}</dd></div>{% endif %}
+    </dl>
+    <p class="note">Sensor: <span class="tag {{ health.status }}">{{ health.status }}</span> {{ health.labels|join:", " }}</p>
+    <p class="note"><a href="{% url 'field_settings' field.id %}">{% t "settings" %}</a> · <a href="{% url 'health' %}">{% t "nav_health" %}</a> · <a href="{% url 'explore' %}">{% t "nav_explore" %}</a></p>
+  </div>
+  {% if geo %}<div id="fmap" role="img" aria-label="Map of {{ field.name }}"></div>{% endif %}
+</section>
+{% if geo %}{{ geo|json_script:"geo" }}{% endif %}
+{% endblock %}
+{% block scripts %}
+{% if geo %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'farm/fieldmap.js' %}"></script>
+{% endif %}
+{% if latest %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{% static 'farm/dashboard.js' %}"></script>
+{% endif %}
+{% endblock %}

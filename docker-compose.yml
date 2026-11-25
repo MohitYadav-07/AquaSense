@@ -1,0 +1,64 @@
+# Copy .env.example to .env, generate unique secrets, then run docker compose up --build.
+x-env: &env
+  MYSQL_HOST: mysql
+  MYSQL_DB: aquasense
+  MYSQL_USER: aqua
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+  API_KEY: ${API_KEY:?Set API_KEY in .env}
+  API_URL: http://api:5001
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY in .env}
+  DJANGO_DEBUG: "0"
+  DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+  APP_TIMEZONE: ${APP_TIMEZONE:-Asia/Kolkata}
+  TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+  TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+  TWILIO_FROM: ${TWILIO_FROM:-}
+  NOTIFY_CHANNEL: ${NOTIFY_CHANNEL:-sms}
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: aquasense
+      MYSQL_USER: aqua
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}
+    ports: ["3307:3306"]
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    command: ["api"]
+    environment: *env
+    ports: ["5001:5001"]
+    volumes: ["models:/app/ml/models"]
+    depends_on:
+      mysql: {condition: service_healthy}
+
+  dashboard:
+    build: .
+    command: ["dashboard"]
+    environment: *env
+    ports: ["8000:8000"]
+    depends_on:
+      mysql: {condition: service_healthy}
+      api: {condition: service_started}
+
+  simulator:
+    build: .
+    command: ["simulator"]
+    environment: *env
+    profiles: ["demo"]
+    depends_on:
+      api: {condition: service_started}
+
+volumes:
+  mysql_data:
+  models:

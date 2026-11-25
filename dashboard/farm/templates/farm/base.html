@@ -1,0 +1,55 @@
+{% load static aq %}<!doctype html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0C3B40">
+<title>{% block title %}AquaSense{% endblock %}</title>
+<link rel="manifest" href="{% url 'manifest' %}">
+<link rel="icon" href="{% static 'farm/icons/icon-192.png' %}">
+<link rel="apple-touch-icon" href="{% static 'farm/icons/icon-192.png' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600{% if lang == 'hi' %}&family=Noto+Sans+Devanagari:wght@400;600{% elif lang == 'te' %}&family=Noto+Sans+Telugu:wght@400;600{% endif %}&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'farm/theme.css' %}">
+</head>
+<body class="{% if not user.is_authenticated %}bare{% endif %}">
+{% if user.is_authenticated %}
+<aside class="side">
+  <a class="brand" href="{% url 'dashboard' %}">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path d="M16 3C16 3 6 14.2 6 20.5a10 10 0 0 0 20 0C26 14.2 16 3 16 3Z" fill="#D8B77A"/><path d="M11 21c2.5-2 5-2 10 0" stroke="#0C3B40" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    <span>AquaSense</span>
+  </a>
+  <nav aria-label="Main">
+    <p class="nav-h">{% t "nav_fields" %}</p>
+    {% for f in nav_fields %}
+      <a href="{% url 'field' f.id %}" class="{% if page == 'dashboard' and field.id == f.id %}on{% endif %}">{{ f.name }}<small>{{ f.crop }}</small></a>
+    {% endfor %}
+    <p class="nav-h">{% t "nav_manage" %}</p>
+    <a href="{% url 'explore' %}" class="{% if page == 'explore' %}on{% endif %}">{% t "nav_explore" %}</a>
+    <a href="{% url 'schedule' %}" class="{% if page == 'schedule' %}on{% endif %}">{% t "nav_schedule" %}</a>
+    <a href="{% url 'savings' %}" class="{% if page == 'savings' %}on{% endif %}">{% t "nav_savings" %}</a>
+    <a href="{% url 'alerts' %}" class="{% if page == 'alerts' %}on{% endif %}">{% t "nav_alerts" %}{% if unread_alerts %}<b class="pip">{{ unread_alerts }}</b>{% endif %}</a>
+    <a href="{% url 'health' %}" class="{% if page == 'health' %}on{% endif %}">{% t "nav_health" %}</a>
+    <a href="{% url 'reports' %}" class="{% if page == 'reports' %}on{% endif %}">{% t "nav_reports" %}</a>
+    {% if user.is_staff %}<a href="{% url 'coop' %}" class="{% if page == 'coop' %}on{% endif %}">{% t "nav_coop" %}</a>{% endif %}
+  </nav>
+  <div class="sidefoot">
+    <p class="nav-h">{% t "language" %}</p>
+    <div class="langs">{% for code, label in langs %}<a href="{% url 'set_language' code %}" class="{% if lang == code %}on{% endif %}" lang="{{ code }}">{{ label }}</a>{% endfor %}</div>
+    <form method="post" action="{% url 'logout' %}" id="logout">{% csrf_token %}<button class="linkbtn">{% t "logout" %} ({{ user.username }})</button></form>
+  </div>
+</aside>
+{% endif %}
+<main class="main">
+  {% if messages %}<ul class="msgs" role="status">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+{% block scripts %}{% endblock %}
+<script>
+if ("serviceWorker" in navigator) { navigator.serviceWorker.register("{% url 'sw' %}").catch(function () {}); }
+var lo = document.getElementById("logout");
+if (lo) lo.addEventListener("submit", function () { if (window.caches) caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); }); });
+</script>
+</body>
+</html>

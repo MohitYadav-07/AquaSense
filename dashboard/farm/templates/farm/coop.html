@@ -1,0 +1,16 @@
+{% extends "farm/base.html" %}{% load aq %}
+{% block title %}Cooperative view · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>{% t "nav_coop" %}</h1><p class="sub">Every field across all member farms.</p></div></header>
+<section class="panel"><table><thead><tr><th>Farmer</th><th>Field</th><th>Crop</th><th>Moisture</th><th>Soil</th><th>Sensor</th><th>Valve</th><th>Water used (30d)</th><th>Alerts</th></tr></thead><tbody>
+{% for r in rows %}<tr>
+<td>{{ r.owner }}</td><td><a href="{% url 'field' r.field.id %}">{{ r.field.name }}</a></td><td>{{ r.field.crop }}</td>
+<td>{% if r.latest %}{{ r.latest.soil_moisture|floatformat:1 }}%{% else %}-{% endif %}</td>
+<td>{% if r.status %}<span class="status {{ r.status }} small"><i></i>{{ r.status }}</span>{% else %}-{% endif %}</td>
+<td><span class="tag {{ r.health.status }}">{{ r.health.status }}</span></td>
+<td>{{ r.field.valve_state }} / {{ r.field.valve_mode }}</td>
+<td>{{ r.used }} L{% if r.saved_pct is not None %} ({{ r.saved_pct }}% saved){% endif %}</td>
+<td>{% if r.unread %}<b class="pip">{{ r.unread }}</b>{% else %}0{% endif %}</td></tr>
+{% empty %}<tr><td colspan="9" class="note">No fields yet.</td></tr>{% endfor %}
+</tbody></table></section>
+{% endblock %}

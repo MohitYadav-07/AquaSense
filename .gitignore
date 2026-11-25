@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Secrets and local configuration
+.env
+.env.*.local
+!.env.example
+
+# Generated ML artifacts and runtime data
+ml/models/
+*.sqlite3
+*.db
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

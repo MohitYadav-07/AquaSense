@@ -1,0 +1,9 @@
+.git
+.venv
+__pycache__
+*.pyc
+.env
+ml/models
+ml/training_data.csv
+dashboard/staticfiles
+docs

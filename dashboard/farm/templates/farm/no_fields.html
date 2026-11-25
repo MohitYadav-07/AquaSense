@@ -1,0 +1,6 @@
+{% extends "farm/base.html" %}
+{% block content %}
+<section class="panel empty"><h2>No fields yet</h2>
+<p>Add your first field by outlining it on the map. <a href="{% url 'explore' %}">Open Explore regions</a>.</p>
+{% if not user.is_staff %}<p class="note">If you expected to see fields here, ask your cooperative administrator to assign them to your account.</p>{% endif %}</section>
+{% endblock %}

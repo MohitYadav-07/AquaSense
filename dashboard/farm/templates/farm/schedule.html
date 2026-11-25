@@ -1,0 +1,39 @@
+{% extends "farm/base.html" %}
+{% block title %}Irrigation schedule · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>Irrigation schedule</h1><p class="sub">Review planned waterings, add your own, and mark them done.</p></div></header>
+
+<section class="panel">
+  <h3>Planned</h3>
+  <table>
+    <thead><tr><th>Field</th><th>When</th><th>Run time</th><th>Water</th><th>Why</th><th></th></tr></thead>
+    <tbody>
+    {% for s in pending %}
+      <tr><td>{{ s.field.name }}</td><td>{{ s.scheduled_for|date:"D d M, H:i" }}</td><td>{{ s.duration_min }} min</td><td>{{ s.volume_l }} L</td>
+        <td>{{ s.reason }}</td>
+        <td class="acts">{% if s.status == 'running' %}<span class="tag">Running</span>{% else %}<form method="post">{% csrf_token %}<input type="hidden" name="id" value="{{ s.id }}">
+          <button name="action" value="done" class="btn small">Mark done</button>
+          <button name="action" value="skipped" class="btn small ghost">Skip</button></form>{% endif %}</td></tr>
+    {% empty %}<tr><td colspan="6" class="note">Nothing planned. New waterings appear here when the forecast says soil will run dry.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="panel">
+  <h3>Add a watering</h3>
+  <form method="post" class="inline">{% csrf_token %}<input type="hidden" name="action" value="add">
+    <label>Field<select name="field">{% for f in fields %}<option value="{{ f.id }}">{{ f.name }}</option>{% endfor %}</select></label>
+    <label>Start<input type="datetime-local" name="when" value="{{ default_when }}" required></label>
+    <label>Minutes<input type="number" name="minutes" value="45" min="5" required></label>
+    <button class="btn">Add watering</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Recent history</h3>
+  <table><tbody>
+  {% for s in history %}<tr><td>{{ s.field.name }}</td><td>{{ s.scheduled_for|date:"d M, H:i" }}</td><td>{{ s.volume_l }} L</td><td><span class="tag {{ s.status }}">{{ s.status|capfirst }}</span></td></tr>
+  {% empty %}<tr><td class="note">No completed waterings yet.</td></tr>{% endfor %}
+  </tbody></table>
+</section>
+{% endblock %}

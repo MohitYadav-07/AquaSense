@@ -1,0 +1,18 @@
+{% extends "farm/base.html" %}
+{% block title %}Settings · {{ field.name }}{% endblock %}
+{% block content %}
+<header class="head"><div><h1>{{ field.name }}: settings</h1><p class="sub">Crop, alerts and safety limits for this field.</p></div></header>
+<form method="post" class="panel fieldform wide">{% csrf_token %}
+  <label>Field name<input name="name" value="{{ field.name }}" maxlength="80" required></label>
+  <label>Crop<select name="crop">{% for c in crops %}<option {% if c == field.crop %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></label>
+  <label>Planting date (sets growth-stage thresholds)<input type="date" name="planted_on" value="{{ field.planted_on|date:'Y-m-d' }}"></label>
+  <label>Alert phone (SMS / WhatsApp, e.g. +919876543210)<input type="tel" name="contact_phone" value="{{ field.contact_phone|default:'' }}" pattern="\+?[0-9]{8,15}"></label>
+  <label>Alert language<select name="language"><option value="en" {% if field.language == 'en' %}selected{% endif %}>English</option><option value="hi" {% if field.language == 'hi' %}selected{% endif %}>हिन्दी</option><option value="te" {% if field.language == 'te' %}selected{% endif %}>తెలుగు</option></select></label>
+  <label>Water below (%)<input type="number" step="any" name="moisture_low" value="{{ field.moisture_low|floatformat:'-1' }}" min="0" max="99" required></label>
+  <label>Refill to (%)<input type="number" step="any" name="moisture_high" value="{{ field.moisture_high|floatformat:'-1' }}" min="1" max="100" required></label>
+  <label>Root depth (mm)<input type="number" name="root_depth_mm" value="{{ field.root_depth_mm }}" min="50" required></label>
+  <label>Drip flow (litres per hour)<input type="number" name="flow_lph" value="{{ field.flow_lph }}" min="100" required></label>
+  <label>Longest single valve run (minutes, max 240)<input type="number" name="max_run_min" value="{{ field.max_run_min }}" min="5" max="240" required></label>
+  <button class="btn">Save settings</button>
+</form>
+{% endblock %}

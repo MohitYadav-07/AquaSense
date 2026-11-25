@@ -1,0 +1,33 @@
+{% extends "farm/base.html" %}{% load static aq %}
+{% block title %}Water savings · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>{% t "nav_savings" %}</h1>
+  <p class="sub">Water applied by AquaSense compared with a conventional fixed schedule of {{ baseline_mm }} mm per day.</p></div>
+  <div class="seg period"><a href="?days=7" class="{% if days == 7 %}on{% endif %}">7 days</a><a href="?days=30" class="{% if days == 30 %}on{% endif %}">30 days</a><a href="?days=90" class="{% if days == 90 %}on{% endif %}">90 days</a></div></header>
+
+{% if rows %}
+<section class="cards">
+  <div class="panel stat"><p class="note">Water saved</p><p class="bignum">{{ total.saved_l|floatformat:0 }} <small>L</small></p><p class="note">{{ total.tankers }} tanker loads of 10,000 L</p></div>
+  <div class="panel stat"><p class="note">Saving</p><p class="bignum">{{ total.saved_pct }}<small>%</small></p><p class="note">{% if total.saved_l < 0 %}more than the baseline{% else %}below the baseline{% endif %}</p></div>
+  <div class="panel stat"><p class="note">Water applied</p><p class="bignum">{{ total.actual_l|floatformat:0 }} <small>L</small></p><p class="note">baseline {{ total.baseline_l|floatformat:0 }} L</p></div>
+</section>
+<section class="panel"><h3>Cumulative water use</h3><canvas id="sv" height="120" data-url="{% url 'savings_json' %}?days={{ days }}"></canvas></section>
+<section class="panel"><h3>By field</h3>
+<table><thead><tr><th>Field</th><th>Days counted</th><th>Applied (L)</th><th>Baseline (L)</th><th>Saved</th></tr></thead><tbody>
+{% for r in rows %}<tr><td>{{ r.field.name }}</td><td>{{ r.days }}</td><td>{{ r.actual_l }}</td><td>{{ r.baseline_l }}</td><td>{{ r.saved_l }} L ({{ r.saved_pct }}%)</td></tr>{% endfor %}
+</tbody></table>
+<p class="note">Only waterings marked done or running count as applied. The baseline is an estimate, set by <code>BASELINE_MM_PER_DAY</code>; it is not a measurement.</p></section>
+{% else %}<section class="panel empty"><h2>No data yet</h2><p>Savings appear once your sensors have reported and waterings have run.</p></section>{% endif %}
+{% endblock %}
+{% block scripts %}{% if rows %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+var c = document.getElementById("sv");
+fetch(c.dataset.url).then(function (r) { return r.json(); }).then(function (d) {
+  new Chart(c, { type: "line", data: { labels: d.labels, datasets: [
+    { label: "Conventional schedule (estimate)", data: d.baseline, borderColor: "#B88B3E", borderDash: [5, 4], pointRadius: 0, borderWidth: 2, tension: .2 },
+    { label: "AquaSense", data: d.actual, borderColor: "#0C3B40", backgroundColor: "rgba(46,143,163,.18)", fill: true, pointRadius: 0, borderWidth: 2, tension: .2 }]},
+    options: { interaction: { mode: "index", intersect: false }, plugins: { legend: { position: "bottom" } },
+      scales: { x: { ticks: { maxTicksLimit: 8 }, grid: { display: false } }, y: { ticks: { callback: function (v) { return v.toLocaleString() + " L"; } } } } } });
+});
+</script>{% endif %}{% endblock %}

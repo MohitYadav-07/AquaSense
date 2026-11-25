@@ -1,0 +1,37 @@
+{% extends "farm/base.html" %}{% load static %}
+{% block title %}Explore regions · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>Explore regions</h1>
+  <p class="sub">Search any city or district to see its weather, water outlook and location details. Click the map to inspect a spot.</p></div></header>
+
+<form id="search" class="panel searchbar" role="search" autocomplete="off">
+  <label class="grow">Place<input id="q" type="search" placeholder="e.g. Anantapur, Jodhpur, Nairobi" required></label>
+  <button class="btn">Search</button>
+  <div class="chips" id="chips" aria-label="Your fields"></div>
+</form>
+<ul id="results" class="results" hidden></ul>
+
+<section class="explore">
+  <div class="panel mapwrap">
+    <div class="drawbar" id="drawbar">
+      <button type="button" class="btn small" id="d-start">Select area for a new field</button>
+      <button type="button" class="btn small" id="d-undo" hidden>Undo point</button>
+      <button type="button" class="btn small" id="d-finish" hidden>Finish area</button>
+      <button type="button" class="btn small ghost" id="d-clear" hidden>Cancel</button>
+      <span class="note" id="d-hint">Zoom to your land first, then outline it point by point.</span>
+    </div>
+    <div id="map" role="application" aria-label="Map"></div>
+  </div>
+  <div class="panel info" id="info" aria-live="polite">
+    <h3>Nothing selected</h3>
+    <p class="note">Search for a place or click anywhere on the map. Your fields are marked in sand.</p>
+  </div>
+</section>
+{{ pins|json_script:"pins" }}
+<div id="csrf" data-url="{% url 'field_create' %}" data-today="{{ today }}" hidden>{% csrf_token %}</div>
+{% endblock %}
+{% block scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{% static 'farm/explore.js' %}"></script>
+{% endblock %}

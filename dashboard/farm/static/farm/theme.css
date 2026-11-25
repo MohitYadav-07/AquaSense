@@ -1,0 +1,162 @@
+:root{
+  --deep:#0C3B40; --ink:#12262A; --mist:#E7EFEC; --paper:#F8FBFA; --line:#D0DDD9;
+  --sand:#D8B77A; --leaf:#4F8A5B; --clay:#B5472E; --muted:#4F6568;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;display:grid;grid-template-columns:250px 1fr;min-height:100vh;background:var(--mist);color:var(--ink);font:16px/1.55 "Figtree","Noto Sans Devanagari","Noto Sans Telugu",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",Georgia,serif;margin:0;letter-spacing:-.01em}
+a{color:var(--deep)}
+:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+
+.side{background:var(--deep);color:#DCEBE8;padding:28px 18px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font:700 21px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif;margin:0 8px 30px}
+.nav-h{margin:22px 10px 8px;font-size:13px;color:#8FB3AE}
+.side nav a{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 12px;border-radius:10px;color:#DCEBE8;text-decoration:none}
+.side nav a small{color:#8FB3AE;font-size:13px}
+.side nav a:hover{background:rgba(255,255,255,.07)}
+.side nav a.on{background:var(--sand);color:var(--ink);font-weight:600}
+.side nav a.on small{color:#4a3d22}
+.pip{background:var(--clay);color:#fff;border-radius:99px;font-size:12px;padding:1px 8px}
+
+.main{padding:34px clamp(18px,4vw,48px) 60px;max-width:1180px;width:100%}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.head h1{font-size:clamp(30px,4vw,44px);line-height:1.05}
+.sub,.stamp,.note{color:var(--muted);margin:6px 0 0}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:22px;margin:0 0 18px}
+.panel h3{font-size:19px;margin-bottom:12px}
+
+.hero{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+.column{margin:0;text-align:center;background:linear-gradient(180deg,#F8FBFA,#EAF2EF)}
+.column svg{width:100%;height:auto;overflow:visible}
+.column figcaption{margin-top:6px;color:var(--muted)}
+.column strong{font:700 28px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif;color:var(--deep)}
+.g-lab{font:500 11px "Figtree","Noto Sans Devanagari","Noto Sans Telugu",sans-serif;fill:#3b5256}
+.lede{font-size:clamp(22px,2.6vw,31px);line-height:1.2;font-weight:500;max-width:30ch;margin:4px 0 8px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.facts div{padding:12px 14px;border-left:1px solid var(--line)}
+.facts div:first-child{border-left:0;padding-left:0}
+.facts dt{color:var(--muted);font-size:14px}
+.facts dd{margin:0;font:700 22px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif}
+.chart{padding:14px 16px}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.big{font:700 26px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif;color:var(--deep);margin:0}
+.alert{display:flex;justify-content:space-between;gap:12px;margin:0 0 8px;padding:10px 14px;border-radius:10px;border-left:4px solid var(--leaf);background:#EEF5F1}
+.alert.warning{border-color:var(--sand);background:#F6EFDF}
+.alert.critical{border-color:var(--clay);background:#F6E4DF}
+.alert.read{opacity:.55}
+.alert time{color:var(--muted);font-size:14px;white-space:nowrap}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:14px;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.acts form{display:flex;gap:6px}
+.tag{padding:2px 10px;border-radius:99px;font-size:13px;background:#E3EFE6;color:#2F5E3A}
+.tag.skipped{background:#EFE6D3;color:#6B5320}
+
+.btn{font:600 15px "Figtree","Noto Sans Devanagari","Noto Sans Telugu",sans-serif;background:var(--deep);color:#fff;border:0;border-radius:10px;padding:10px 18px;cursor:pointer}
+.btn:hover{background:#12525A}
+.btn.ghost{background:transparent;color:var(--deep);border:1px solid var(--deep)}
+.btn.ghost:hover{background:rgba(12,59,64,.07)}
+.btn.small{padding:6px 12px;font-size:14px}
+.inline{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+input,select{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+code{background:#E3ECE9;padding:2px 6px;border-radius:6px}
+
+@media (max-width:900px){
+  body{grid-template-columns:1fr}
+  .side{position:static;height:auto}
+  .hero,.row{grid-template-columns:1fr}
+  .facts{grid-template-columns:repeat(2,1fr)}
+  .facts div:nth-child(3){border-left:0;padding-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Explore regions */
+.searchbar{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.searchbar .grow{flex:1 1 280px}
+.searchbar input{width:100%}
+.chips{display:flex;gap:8px;flex-wrap:wrap;flex-basis:100%}
+.chip{font:500 14px "Figtree","Noto Sans Devanagari","Noto Sans Telugu",sans-serif;border:1px solid var(--sand);background:#F3E8D1;color:var(--ink);border-radius:99px;padding:5px 14px;cursor:pointer}
+.chip:hover{background:var(--sand)}
+.results{list-style:none;margin:-8px 0 18px;padding:6px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r)}
+.results button{display:grid;gap:2px;width:100%;text-align:left;font:inherit;background:none;border:0;border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink)}
+.results button:hover{background:var(--mist)}
+.results span{color:var(--muted);font-size:14px}
+.results .note{padding:8px 12px;margin:0}
+.explore{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:18px;align-items:start}
+.mapwrap{padding:8px}
+#map{height:min(70vh,600px);min-height:380px;border-radius:10px;z-index:0}
+.info h3{font-size:24px;margin-bottom:4px}
+.info h4{font:700 16px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif;margin:18px 0 8px}
+.wiki{font-size:15px;line-height:1.6;max-width:62ch}
+.facts.two{grid-template-columns:repeat(2,1fr);border-bottom:0}
+.facts.two div{border-left:0;padding:10px 0;border-top:1px solid var(--line)}
+.facts.two dd{font-size:18px}
+.bars{display:flex;gap:8px;align-items:flex-end;height:110px;padding-top:6px}
+.bar{flex:1;display:flex;align-items:flex-end;gap:2px;height:100%;position:relative;padding-bottom:18px}
+.bar i{flex:1;display:block;min-height:2px;border-radius:3px 3px 0 0}
+.bar .rain{background:#2E8FA3}.bar .et{background:var(--sand)}
+.bar span{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:12px;color:var(--muted)}
+.key{font-size:13px;color:var(--muted);margin:6px 0 12px}
+.k{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:baseline}
+.k.rain{background:#2E8FA3}.k.et{background:var(--sand)}
+.alert.info{border-color:#2E8FA3;background:#E4F1F3}
+@media (max-width:900px){.explore{grid-template-columns:1fr}}
+
+/* Draw area and add field */
+.drawbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 4px 10px}
+.drawbar .note{margin:0 0 0 6px;font-size:14px}
+.addfield{margin-top:14px;padding-top:6px;border-top:1px solid var(--line)}
+.fieldform{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fieldform label:first-of-type,.fieldform button{grid-column:1/-1}
+.fieldform input,.fieldform select{width:100%}
+.fielddetail{display:grid;grid-template-columns:1fr 1.2fr;gap:22px;align-items:start}
+#fmap{height:300px;border-radius:10px;z-index:0}
+@media (max-width:900px){.fielddetail{grid-template-columns:1fr}.fieldform{grid-template-columns:1fr}}
+
+/* v2: auth, status, valve, savings, health, PWA */
+body.bare{grid-template-columns:1fr;place-items:center}
+.loginbox{max-width:380px;margin:12vh auto 0;width:100%}
+.loginbox form{display:grid;gap:14px;margin-top:14px}
+.loginbrand{display:flex;align-items:center;gap:12px}
+.loginbrand h1{font-size:30px}
+.sidefoot{margin-top:28px;border-top:1px solid rgba(255,255,255,.12);padding-top:6px}
+.langs{display:flex;gap:6px;flex-wrap:wrap;margin:0 8px 10px}
+.langs.center{justify-content:center;margin-top:18px}
+.langs a{color:#DCEBE8;text-decoration:none;border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:3px 12px;font-size:14px}
+.langs.center a{color:var(--deep);border-color:var(--line)}
+.langs a.on{background:var(--sand);color:var(--ink);border-color:var(--sand)}
+.linkbtn{background:none;border:0;color:#BFD6D2;font:inherit;font-size:14px;padding:6px 10px;cursor:pointer;text-decoration:underline}
+.msgs{list-style:none;margin:0 0 16px;padding:0}
+.msgs li{padding:10px 14px;border-radius:10px;background:#E4F1F3;border-left:4px solid #2E8FA3;margin-bottom:6px}
+.msgs li.error{background:#F6E4DF;border-color:var(--clay)}
+.msgs li.success{background:#E3EFE6;border-color:var(--leaf)}
+.headside{text-align:right}
+.status{display:inline-flex;align-items:center;gap:8px;font:700 20px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif;padding:6px 16px 6px 12px;border-radius:99px;background:#E3EFE6;color:#2F5E3A}
+.status i{width:14px;height:14px;border-radius:50%;background:var(--leaf)}
+.status.dry{background:#F6E4DF;color:#8A3220}.status.dry i{background:var(--clay)}
+.status.wet{background:#E4F1F3;color:#1D5F6E}.status.wet i{background:#2E8FA3}
+.status.small{font:600 14px "Figtree","Noto Sans Devanagari","Noto Sans Telugu",sans-serif;padding:2px 10px 2px 8px}.status.small i{width:9px;height:9px}
+.chips2{display:flex;gap:8px;flex-wrap:wrap}
+.pillnote{background:#F3E8D1;border-radius:99px;padding:3px 12px;font-size:14px;color:var(--ink)}
+.valve{display:grid;grid-template-columns:1fr 1.3fr;gap:22px;align-items:start}
+.valvectl{display:grid;gap:14px}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:10px;background:var(--muted)}
+.dot.open{background:#2E8FA3;box-shadow:0 0 0 4px rgba(46,143,163,.25)}
+.seg{display:inline-flex;border:1px solid var(--deep);border-radius:10px;overflow:hidden;width:fit-content}
+.seg button,.seg a{font:600 15px "Figtree","Noto Sans Devanagari","Noto Sans Telugu",sans-serif;background:transparent;color:var(--deep);border:0;padding:8px 18px;cursor:pointer;text-decoration:none}
+.seg .on{background:var(--deep);color:#fff}
+.tag.ok{background:#E3EFE6;color:#2F5E3A}.tag.warning{background:#F6EFDF;color:#6B5320}.tag.offline{background:#F6E4DF;color:#8A3220}
+.mono{font-family:ui-monospace,monospace;font-size:14px!important;word-break:break-all}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.stat .bignum{font:700 40px "Bricolage Grotesque","Noto Sans Devanagari","Noto Sans Telugu",serif;color:var(--deep);margin:2px 0}
+.stat .bignum small{font-size:20px;color:var(--muted)}
+.period{align-self:flex-end}
+.rowhead{display:flex;align-items:center;gap:12px;margin-bottom:6px}.rowhead h3{margin:0}
+.fieldform.wide{max-width:760px}.fieldform.wide label:first-of-type{grid-column:auto}
+@media (max-width:900px){.valve,.cards{grid-template-columns:1fr}.headside{text-align:left}}

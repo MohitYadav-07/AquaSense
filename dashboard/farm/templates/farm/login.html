@@ -1,0 +1,19 @@
+{% extends "farm/base.html" %}{% load aq %}
+{% block title %}Sign in · AquaSense{% endblock %}
+{% block content %}
+<section class="loginbox panel">
+  <div class="loginbrand">
+    <svg viewBox="0 0 32 32" width="44" height="44" aria-hidden="true"><path d="M16 3C16 3 6 14.2 6 20.5a10 10 0 0 0 20 0C26 14.2 16 3 16 3Z" fill="#D8B77A"/><path d="M11 21c2.5-2 5-2 10 0" stroke="#0C3B40" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    <h1>AquaSense</h1>
+  </div>
+  <p class="sub">Sign in to see your fields.</p>
+  <form method="post">{% csrf_token %}
+    {% if form.errors %}<p class="alert critical">That username and password did not match.</p>{% endif %}
+    <label>Username<input name="username" autocomplete="username" required autofocus></label>
+    <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn">Sign in</button>
+  </form>
+  <div class="langs center">{% for code, label in langs %}<a href="{% url 'set_language' code %}" class="{% if lang == code %}on{% endif %}" lang="{{ code }}">{{ label }}</a>{% endfor %}</div>
+</section>
+{% endblock %}

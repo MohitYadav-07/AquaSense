@@ -1,0 +1,15 @@
+{% extends "farm/base.html" %}
+{% block title %}Alerts · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>Alerts</h1><p class="sub">Dry soil, over-watering and low sensor batteries.</p></div>
+  <form method="post">{% csrf_token %}<button class="btn ghost">Mark all as read</button></form></header>
+<section class="panel">
+  {% for a in items %}
+    <p class="alert {{ a.level }} {% if a.is_read %}read{% endif %}"><span>{{ a.message }}</span><time>{{ a.created_at|date:"d M, H:i" }}</time></p>
+  {% empty %}<p class="note">No alerts so far.</p>{% endfor %}
+</section>
+<section class="panel"><h3>Messages sent</h3>
+  {% for m in messages_sent %}<p class="alert info"><span>{{ m.message }} <small class="note">to {{ m.phone }} ({{ m.status }})</small></span><time>{{ m.created_at|date:"d M, H:i" }}</time></p>
+  {% empty %}<p class="note">No SMS or WhatsApp messages yet. Add an alert phone number in the field settings.</p>{% endfor %}
+</section>
+{% endblock %}

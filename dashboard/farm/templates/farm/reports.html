@@ -1,0 +1,13 @@
+{% extends "farm/base.html" %}{% load aq %}
+{% block title %}Reports · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>{% t "nav_reports" %}</h1><p class="sub">Download your data for records, evaluations or subsidy applications.</p></div></header>
+<form method="get" class="panel inline">
+  <label>Field<select name="field"><option value="all">All my fields</option>{% for f in fields %}<option value="{{ f.id }}">{{ f.name }}</option>{% endfor %}</select></label>
+  <label>Period<select name="days"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select></label>
+  <button class="btn" formaction="{% url 'report_pdf' %}">Water-use report (PDF)</button>
+  <button class="btn ghost" formaction="{% url 'report_csv' 'readings' %}">Readings (CSV)</button>
+  <button class="btn ghost" formaction="{% url 'report_csv' 'waterings' %}">Waterings (CSV)</button>
+  <button class="btn ghost" formaction="{% url 'report_csv' 'alerts' %}">Alerts (CSV)</button>
+</form>
+{% endblock %}

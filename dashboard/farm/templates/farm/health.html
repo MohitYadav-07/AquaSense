@@ -1,0 +1,24 @@
+{% extends "farm/base.html" %}{% load aq %}
+{% block title %}Sensor health · AquaSense{% endblock %}
+{% block content %}
+<header class="head"><div><h1>{% t "nav_health" %}</h1><p class="sub">Spot stuck, silent or low-battery sensors, and calibrate the soil probe.</p></div></header>
+{% for r in rows %}
+<section class="panel">
+  <div class="rowhead"><h3>{{ r.field.name }}</h3><span class="tag {{ r.health.status }}">{{ r.health.status }}</span></div>
+  <dl class="facts two">
+    <div><dt>Sensor code</dt><dd>{{ r.sensor.device_code|default:"none" }}</dd></div>
+    <div><dt>Last reading</dt><dd>{% if r.latest %}{{ r.latest.recorded_at|date:"d M, H:i" }}{% else %}never{% endif %}</dd></div>
+    <div><dt>Battery</dt><dd>{{ r.latest.battery|default_if_none:"-"|floatformat:"-1" }}%</dd></div>
+    <div><dt>Calibration</dt><dd>×{{ r.sensor.cal_scale|floatformat:"-3" }} {% if r.sensor.cal_offset >= 0 %}+{% endif %}{{ r.sensor.cal_offset|floatformat:"-2" }}</dd></div>
+  </dl>
+  {% for l in r.health.labels %}<p class="alert warning">{{ l }}</p>{% empty %}<p class="note">No problems found.</p>{% endfor %}
+  {% if r.sensor %}
+  <form method="post" action="{% url 'calibrate' r.sensor.id %}" class="inline">{% csrf_token %}
+    <label>Scale<input type="number" step="0.001" min="0.5" max="2" name="scale" value="{{ r.sensor.cal_scale|floatformat:'3' }}"></label>
+    <label>Offset (%-points)<input type="number" step="0.1" min="-30" max="30" name="offset" value="{{ r.sensor.cal_offset|floatformat:'1' }}"></label>
+    <button class="btn small">Save calibration</button>
+    <span class="note">Corrected moisture = raw × scale + offset.</span>
+  </form>{% endif %}
+</section>
+{% empty %}<section class="panel empty"><p>No fields yet.</p></section>{% endfor %}
+{% endblock %}
